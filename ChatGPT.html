@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>РАСХОДЫ — Деловой трекер</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3d;
+    --accent: #f0c040;
+    --accent2: #ff6b35;
+    --accent3: #4ecdc4;
+    --text: #e8e8f0;
+    --muted: #6b6b85;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Manrope', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(240,192,64,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,192,64,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(240,192,64,0.3);
+  }
+
+  .logo span { color: var(--text); }
+
+  .header-date {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  .header-date strong { color: var(--text); display: block; font-size: 15px; }
+
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* STATS GRID */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.day::before { background: var(--accent); }
+  .stat-card.month::before { background: var(--accent2); }
+  .stat-card.year::before { background: var(--accent3); }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 38px;
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card.day .stat-value { color: var(--accent); }
+  .stat-card.month .stat-value { color: var(--accent2); }
+  .stat-card.year .stat-value { color: var(--accent3); }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ADD EXPENSE */
+  .add-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input, select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(240,192,64,0.1);
+  }
+
+  select option { background: var(--surface2); }
+
+  .btn-add {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    height: 46px;
+  }
+
+  .btn-add:hover {
+    background: #ffd060;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(240,192,64,0.25);
+  }
+
+  .btn-add:active { transform: translateY(0); }
+
+  /* CATEGORY FILTER */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .filter-label { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-right: 4px; }
+
+  .filter-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(240,192,64,0.08);
+  }
+
+  /* VIEW TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 8px 20px;
+    border-radius: 9px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+    font-family: var(--font-display);
+    border: none;
+    background: none;
+    font-size: 16px;
+  }
+
+  .tab.active {
+    background: var(--surface);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* TWO COLUMN LAYOUT */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+  }
+
+  /* EXPENSE LIST */
+  .list-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .list-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .list-header h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+
+  .list-count {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .expense-list {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .expense-list::-webkit-scrollbar { width: 4px; }
+  .expense-list::-webkit-scrollbar-track { background: transparent; }
+  .expense-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .expense-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    transition: background 0.15s;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .expense-item:hover { background: rgba(240,192,64,0.03); }
+  .expense-item:last-child { border-bottom: none; }
+
+  .cat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .expense-info { flex: 1; min-width: 0; }
+
+  .expense-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+
+  .expense-meta {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+  }
+
+  .expense-amount {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .btn-del {
+    background: none;
+    border: none;
+    color: var(--border);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .btn-del:hover { color: var(--red); background: rgba(231,76,60,0.1); }
+
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; line-height: 1.6; }
+
+  /* RIGHT PANEL */
+  .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+  /* CHART */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+  }
+
+  .chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .chart-row { display: flex; align-items: center; gap: 10px; }
+
+  .chart-cat-label {
+    font-size: 11px;
+    color: var(--muted);
+    width: 60px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chart-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .chart-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .chart-cat-val {
+    font-size: 12px;
+    font-weight: 700;
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* CATEGORY BREAKDOWN */
+  .breakdown-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+  }
+
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(42,42,61,0.4);
+  }
+
+  .breakdown-item:last-child { border-bottom: none; }
+
+  .breakdown-left { display: flex; align-items: center; gap: 10px; }
+  .breakdown-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .breakdown-name { font-size: 13px; color: var(--text); }
+  .breakdown-count { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .breakdown-total { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+  /* PERIOD NAV */
+  .period-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .nav-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .period-label {
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--text);
+    flex: 1;
+    text-align: center;
+  }
+
+  /* MONTH GRID */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .month-day-header {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    padding: 4px 0;
+    letter-spacing: 1px;
+  }
+
+  .month-day {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    background: var(--surface2);
+    color: var(--muted);
+    position: relative;
+  }
+
+  .month-day:hover { border-color: var(--border); color: var(--text); }
+  .month-day.has-expense { color: var(--accent); background: rgba(240,192,64,0.08); }
+  .month-day.today { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .month-day.selected { background: var(--accent); color: #0a0a0f; font-weight: 700; }
+  .month-day.empty { background: transparent; cursor: default; }
+
+  .day-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent2);
+    position: absolute;
+    bottom: 3px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 8px 32px rgba(46,204,113,0.3);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: var(--red); box-shadow: 0 8px 32px rgba(231,76,60,0.3); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .content-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+    .right-panel { flex-direction: row; flex-wrap: wrap; }
+    .chart-card, .breakdown-card { flex: 1; min-width: 240px; }
+    header { padding: 16px 20px; }
+    main { padding: 20px 16px; }
+  }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .right-panel { flex-direction: column; }
+    .logo { font-size: 22px; }
+    .stat-value { font-size: 28px; }
+  }
+
+  /* CATEGORIES */
+  .categories-section {
+    margin-bottom: 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .quick-cat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 64px;
+    text-align: center;
+  }
+
+  .quick-cat:hover, .quick-cat.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(240,192,64,0.08);
+  }
+
+  .quick-cat-icon { font-size: 22px; }
+
+  /* EXPORT BTN */
+  .export-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .export-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">РАСХОДЫ<span>.</span></div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <button class="export-btn" onclick="exportCSV()">⬇ ЭКСПОРТ CSV</button>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+</header>
+
+<main>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card day">
+      <div class="stat-label">Сегодня</div>
+      <div class="stat-value" id="statDay">0</div>
+      <div class="stat-sub" id="statDayCount">0 трат</div>
+    </div>
+    <div class="stat-card month">
+      <div class="stat-label">Этот месяц</div>
+      <div class="stat-value" id="statMonth">0</div>
+      <div class="stat-sub" id="statMonthCount">0 трат</div>
+    </div>
+    <div class="stat-card year">
+      <div class="stat-label">Этот год</div>
+      <div class="stat-value" id="statYear">0</div>
+      <div class="stat-sub" id="statYearCount">0 трат</div>
+    </div>
+  </div>
+
+  <!-- ADD EXPENSE -->
+  <div class="add-section">
+    <div class="section-title">Добавить расход</div>
+
+    <!-- QUICK CATEGORIES -->
+    <div class="categories-section" id="quickCats"></div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Описание</label>
+        <input type="text" id="inpName" placeholder="Такси, обед, бензин..." />
+      </div>
+      <div class="field">
+        <label>Сумма (сум)</label>
+        <input type="number" id="inpAmount" placeholder="0" min="0" />
+      </div>
+      <div class="field">
+        <label>Дата</label>
+        <input type="date" id="inpDate" />
+      </div>
+      <button class="btn-add" onclick="addExpense()">+ ДОБАВИТЬ</button>
+    </div>
+  </div>
+
+  <!-- TABS & FILTERS -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div class="tabs">
+      <button class="tab active" onclick="setView('day',this)">ДЕНЬ</button>
+      <button class="tab" onclick="setView('month',this)">МЕСЯЦ</button>
+      <button class="tab" onclick="setView('year',this)">ГОД</button>
+      <button class="tab" onclick="setView('all',this)">ВСЕ</button>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-label">Фильтр:</span>
+      <button class="filter-btn active" onclick="setFilter('all',this)">🔘 Все</button>
+      <div id="filterBtns"></div>
+    </div>
+  </div>
+
+  <!-- PERIOD NAV -->
+  <div class="period-nav" id="periodNav" style="display:none;">
+    <button class="nav-btn" onclick="shiftPeriod(-1)">◀</button>
+    <div class="period-label" id="periodLabel"></div>
+    <button class="nav-btn" onclick="shiftPeriod(1)">▶</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-grid">
+    <div class="list-panel">
+      <div class="list-header">
+        <h3 id="listTitle">СПИСОК ТРАТ</h3>
+        <span class="list-count" id="listCount">0</span>
+      </div>
+      <div class="expense-list" id="expenseList"></div>
+    </div>
+
+    <div class="right-panel">
+      <!-- CHART -->
+      <div class="chart-card">
+        <div class="section-title" style="font-size:18px;">По категориям</div>
+        <div class="chart-bars" id="chartBars"></div>
+      </div>
+
+      <!-- BREAKDOWN -->
+      <div class="breakdown-card">
+        <div class="section-title" style="font-size:18px;">Итого</div>
+        <div id="breakdownList"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CATEGORIES ────────────────────────────────────
+const CATS = [
+  { id: 'transport', label: 'Дорога', icon: '🚗', color: '#f0c040' },
+  { id: 'food',      label: 'Еда',    icon: '🍔', color: '#ff6b35' },
+  { id: 'cafe',      label: 'Кафе',   icon: '☕', color: '#e67e22' },
+  { id: 'fuel',      label: 'Бензин', icon: '⛽', color: '#e74c3c' },
+  { id: 'grocery',   label: 'Продукты', icon: '🛒', color: '#2ecc71' },
+  { id: 'work',      label: 'Работа', icon: '💼', color: '#3498db' },
+  { id: 'health',    label: 'Здоровье', icon: '💊', color: '#9b59b6' },
+  { id: 'housing',   label: 'Жильё',  icon: '🏠', color: '#1abc9c' },
+  { id: 'phone',     label: 'Связь',  icon: '📱', color: '#4ecdc4' },
+  { id: 'other',     label: 'Прочее', icon: '📦', color: '#95a5a6' },
+];
+
+// ─── STATE ─────────────────────────────────────────
+let expenses = JSON.parse(localStorage.getItem('expenses_v2') || '[]');
+let selectedCat = CATS[0].id;
+let filterCat = 'all';
+let currentView = 'day';
+let viewOffset = 0;
+const now = new Date();
+
+// ─── INIT ──────────────────────────────────────────
+function init() {
+  document.getElementById('inpDate').value = formatDate(now);
+  updateHeaderDate();
+  renderQuickCats();
+  renderFilters();
+  renderAll();
+}
+
+function formatDate(d) {
+  return d.toISOString().split('T')[0];
+}
+
+function updateHeaderDate() {
+  const d = new Date();
+  const opts1 = { weekday:'long', day:'numeric', month:'long' };
+  const opts2 = { year:'numeric' };
+  document.getElementById('headerDate').innerHTML =
+    `<strong>${d.toLocaleDateString('ru-RU', opts1)}</strong>${d.toLocaleDateString('ru-RU', opts2)}`;
+}
+
+// ─── QUICK CATS ────────────────────────────────────
+function renderQuickCats() {
+  const el = document.getElementById('quickCats');
+  el.innerHTML = CATS.map(c => `
+    <div class="quick-cat ${c.id===selectedCat?'active':''}" onclick="selectCat('${c.id}')">
+      <div class="quick-cat-icon">${c.icon}</div>
+      <div>${c.label}</div>
+    </div>
+  `).join('');
+}
+
+function selectCat(id) {
+  selectedCat = id;
+  renderQuickCats();
+}
+
+// ─── FILTERS ───────────────────────────────────────
+function renderFilters() {
+  document.getElementById('filterBtns').innerHTML = CATS.map(c => `
+    <button class="filter-btn ${filterCat===c.id?'active':''}" onclick="setFilter('${c.id}',this)">
+      ${c.icon} ${c.label}
+    </button>
+  `).join('');
+}
+
+function setFilter(cat, btn) {
+  filterCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+// ─── VIEW ──────────────────────────────────────────
+function setView(v, btn) {
+  currentView = v;
+  viewOffset = 0;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const nav = document.getElementById('periodNav');
+  nav.style.display = (v === 'all') ? 'none' : 'flex';
+  renderAll();
+}
+
+function shiftPeriod(dir) {
+  viewOffset += dir;
+  renderAll();
+}
+
+function getPeriodDates() {
+  const d = new Date(now);
+  if (currentView === 'day') {
+    d.setDate(d.getDate() + viewOffset);
+    const s = formatDate(d);
+    return { start: s, end: s, label: d.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) };
+  }
+  if (currentView === 'month') {
+    d.setMonth(d.getMonth() + viewOffset);
+    const start = new Date(d.getFullYear(), d.getMonth(), 1);
+    const end = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    return { start: formatDate(start), end: formatDate(end),
+      label: start.toLocaleDateString('ru-RU', {month:'long', year:'numeric'}).toUpperCase() };
+  }
+  if (currentView === 'year') {
+    const year = now.getFullYear() + viewOffset;
+    return { start: `${year}-01-01`, end: `${year}-12-31`, label: String(year) };
+  }
+  return null;
+}
+
+// ─── ADD ───────────────────────────────────────────
+function addExpense() {
+  const name   = document.getElementById('inpName').value.trim();
+  const amount = parseFloat(document.getElementById('inpAmount').value);
+  const date   = document.getElementById('inpDate').value;
+
+  if (!name) { showToast('Введите описание!', true); return; }
+  if (!amount || amount <= 0) { showToast('Введите сумму!', true); return; }
+  if (!date) { showToast('Выберите дату!', true); return; }
+
+  const cat = CATS.find(c => c.id === selectedCat);
+  expenses.unshift({ id: Date.now(), name, amount, date, cat: selectedCat });
+  save();
+  renderAll();
+
+  document.getElementById('inpName').value = '';
+  document.getElementById('inpAmount').value = '';
+  showToast(`${cat.icon} Добавлено: ${fmtMoney(amount)}`);
+}
+
+// ─── RENDER ────────────────────────────────────────
+function renderAll() {
+  updateStats();
+  renderList();
+  renderChart();
+  renderBreakdown();
+  updatePeriodLabel();
+}
+
+function getFiltered() {
+  let list = expenses;
+  if (filterCat !== 'all') list = list.filter(e => e.cat === filterCat);
+
+  const period = getPeriodDates();
+  if (period) {
+    list = list.filter(e => e.date >= period.start && e.date <= period.end);
+  }
+  return list;
+}
+
+function updateStats() {
+  const today = formatDate(now);
+  const m = now.getMonth(), y = now.getFullYear();
+
+  const day   = expenses.filter(e => e.date === today);
+  const month = expenses.filter(e => { const d = new Date(e.date); return d.getMonth()===m && d.getFullYear()===y; });
+  const year  = expenses.filter(e => new Date(e.date).getFullYear() === y);
+
+  const sum = arr => arr.reduce((a,b) => a+b.amount, 0);
+
+  document.getElementById('statDay').textContent   = fmtMoney(sum(day));
+  document.getElementById('statMonth').textContent = fmtMoney(sum(month));
+  document.getElementById('statYear').textContent  = fmtMoney(sum(year));
+  document.getElementById('statDayCount').textContent   = `${day.length} трат`;
+  document.getElementById('statMonthCount').textContent = `${month.length} трат`;
+  document.getElementById('statYearCount').textContent  = `${year.length} трат`;
+}
+
+function renderList() {
+  const list = getFiltered();
+  const el = document.getElementById('expenseList');
+  document.getElementById('listCount').textContent = `${list.length} записей`;
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">Нет расходов за этот период</div>
+    </div>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  list.forEach(e => {
+    if (!grouped[e.date]) grouped[e.date] = [];
+    grouped[e.date].push(e);
+  });
+
+  let html = '';
+  Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
+    const dayTotal = grouped[date].reduce((a,b) => a+b.amount, 0);
+    const dateLabel = new Date(date + 'T00:00:00').toLocaleDateString('ru-RU', {day:'numeric', month:'long', weekday:'short'});
+    html += `<div style="padding:8px 24px;background:rgba(240,192,64,0.04);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">${dateLabel}</span>
+      <span style="font-size:13px;font-weight:700;color:var(--accent);">${fmtMoney(dayTotal)}</span>
+    </div>`;
+    grouped[date].forEach(e => {
+      const cat = CATS.find(c => c.id === e.cat) || CATS[CATS.length-1];
+      html += `<div class="expense-item">
+        <div class="cat-icon" style="background:${cat.color}18;">${cat.icon}</div>
+        <div class="expense-info">
+          <div class="expense-name">${escHtml(e.name)}</div>
+          <div class="expense-meta">
+            <span style="color:${cat.color}">${cat.label}</span>
+          </div>
+        </div>
+        <div class="expense-amount">${fmtMoney(e.amount)}</div>
+        <button class="btn-del" onclick="deleteExpense(${e.id})" title="Удалить">✕</button>
+      </div>`;
+    });
+  });
+
+  el.innerHTML = html;
+}
+
+function renderChart() {
+  const list = getFiltered();
+  const totals = {};
+  CATS.forEach(c => totals[c.id] = 0);
+  list.forEach(e => { if (totals[e.cat] !== undefined) totals[e.cat] += e.amount; });
+
+  const max = Math.max(...Object.values(totals), 1);
+
+  document.getElementById('chartBars').innerHTML = CATS
+    .filter(c => totals[c.id] > 0)
+    .sort((a,b) => totals[b.id]-totals[a.id])
+    .map(c => `
+      <div class="chart-row">
+        <div class="chart-cat-label" title="${c.label}">${c.icon} ${c.label}</div>
+        <div class="chart-bar-wrap">
+          <div class="chart-bar-fill" style="width:${(totals[c.id]/max*100).toFixed(1)}%;background:${c.color};"></div>
+        </div>
+        <div class="chart-cat-val" style="color:${c.color}">${fmtMoney(totals[c.id])}</div>
+      </div>
+    `).join('') || '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">Нет данных</div>';
+}
+
+function renderBreakdown() {
+  const list = getFiltered();
+  const totals = {}, counts = {};
+  CATS.forEach(c => { totals[c.id] = 0; counts[c.id] = 0; });
+  list.forEach(e => { totals[e.cat] += e.amount; counts[e.cat]++; });
+
+  const grandTotal = list.reduce((a,b) => a+b.amount, 0);
+
+  const rows = CATS
+    .filter(c => totals[c.id] > 0)
+    .sort((a,b) => totals[b.id]-totals[a.id])
+    .map(c => `
+      <div class="breakdown-item">
+        <div class="breakdown-left">
+          <div class="breakdown-dot" style="background:${c.color}"></div>
+          <span class="breakdown-name">${c.icon} ${c.label}</span>
+          <span class="breakdown-count">(${counts[c.id]})</span>
+        </div>
+        <div class="breakdown-total">${fmtMoney(totals[c.id])}</div>
+      </div>
+    `).join('');
+
+  document.getElementById('breakdownList').innerHTML = rows +
+    `<div style="padding:12px 0 0;margin-top:4px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">ИТОГО</span>
+      <span style="font-family:'Bebas Neue';font-size:22px;color:var(--accent);">${fmtMoney(grandTotal)}</span>
+    </div>`;
+}
+
+function updatePeriodLabel() {
+  const period = getPeriodDates();
+  if (period) document.getElementById('periodLabel').textContent = period.label;
+}
+
+// ─── DELETE ────────────────────────────────────────
+function deleteExpense(id) {
+  expenses = expenses.filter(e => e.id !== id);
+  save();
+  renderAll();
+  showToast('Удалено');
+}
+
+// ─── EXPORT ────────────────────────────────────────
+function exportCSV() {
+  const list = getFiltered();
+  if (!list.length) { showToast('Нет данных для экспорта', true); return; }
+  const header = 'Дата,Описание,Категория,Сумма\n';
+  const rows = list.map(e => {
+    const cat = CATS.find(c=>c.id===e.cat)||CATS[CATS.length-1];
+    return `${e.date},"${e.name}","${cat.label}",${e.amount}`;
+  }).join('\n');
+  const blob = new Blob(['\uFEFF'+header+rows], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `расходы_${formatDate(now)}.csv`;
+  a.click();
+}
+
+// ─── HELPERS ───────────────────────────────────────
+function fmtMoney(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toLocaleString('ru-RU');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function save() {
+  localStorage.setItem('expenses_v2', JSON.stringify(expenses));
+}
+
+function showToast(msg, error=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (error?' error':'');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => t.classList.add('show'));
+  });
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─── ENTER KEY ─────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (document.activeElement.id === 'inpName' || document.activeElement.id === 'inpAmount')) {
+    addExpense();
+  }
+});
+
+// ─── START ─────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
+
